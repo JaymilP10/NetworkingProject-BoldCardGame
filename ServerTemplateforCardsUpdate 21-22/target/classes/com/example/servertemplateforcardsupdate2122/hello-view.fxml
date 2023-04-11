@@ -37,6 +37,7 @@
       <Button fx:id="btnLoad" layoutX="734.0" layoutY="316.0" mnemonicParsing="false" onAction="#load" text="Load" visible="false" />
       <TextField fx:id="txtName" layoutX="321.0" layoutY="31.0" promptText="Name:" />
       <Button fx:id="btnEnterName" layoutX="490.0" layoutY="31.0" mnemonicParsing="false" onAction="#enterName" text="Enter" />
+      <Button layoutX="729.0" layoutY="660.0" mnemonicParsing="false" onAction="#restart" text="Restart" />
 
     </children>
 </AnchorPane>
