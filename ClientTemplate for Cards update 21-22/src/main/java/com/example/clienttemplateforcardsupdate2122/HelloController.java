@@ -383,6 +383,9 @@ public class HelloController implements Initializable {
                     }
                 }
                 if (isMatch){
+                    for (Card card : cardsClicked) {
+                        socket.sendMessage("Save card: " + card.cName);
+                    }
                     return true;
                 }
             }

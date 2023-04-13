@@ -197,6 +197,7 @@ public class HelloController implements Initializable {
                 }
                 cards[i][j] = deck.get(randNum);
                 deck.remove(randNum);
+                saveRemovedCards.add(cards[i][j]);
                 p2Points = p2Points + (cardsClicked.size() * cardsClicked.size());
                 lblp2Points.setText("P2 Points: " + p2Points);
                 isTurn = true;
@@ -367,8 +368,8 @@ public class HelloController implements Initializable {
             for (int j = 0; j < cardsClicked.size(); j++) {
                 for (int k = 0; k < cardsClicked.size(); k++) {
                     if (cardsClicked.get(j).cName.substring(i, i + 1).equals(cardsClicked.get(k).cName.substring(i, i + 1))){
-                        System.out.println(cardsClicked.get(j).cName.substring(i, i + 1));
-                        System.out.println(cardsClicked.get(k).cName.substring(i, i + 1));
+//                        System.out.println(cardsClicked.get(j).cName.substring(i, i + 1));
+//                        System.out.println(cardsClicked.get(k).cName.substring(i, i + 1));
                         isMatch = true;
                     }
                     else {
@@ -377,6 +378,7 @@ public class HelloController implements Initializable {
                     }
                 }
                 if (isMatch){
+                    saveRemovedCards.addAll(cardsClicked);
                     return true;
                 }
             }
@@ -492,8 +494,8 @@ public class HelloController implements Initializable {
                 for (int i = 0; i < deck.size(); i++) {
                     if (deck.get(i).cName.equals(line.substring(line.indexOf(":") + 1))){
                         deck.remove(i);
-                        i--;
                         socket.sendMessage("Remove Card:" + deck.get(i).cName);
+                        i--;
                     }
                 }
             }
@@ -535,7 +537,7 @@ public class HelloController implements Initializable {
                         if (card == cards[k][l]){
                             imageViews[k][l].setImage(imageBack);
                             deck.remove(card);
-                            saveRemovedCards.add(card);
+                            System.out.println("saveremoved cards len: " + saveRemovedCards.size());
                             int randNum = (int) (Math.random() * deck.size());
                             socket.sendMessage("endturn" + "randNum" + randNum + "i" + k + "j" + l);
                             System.out.println("deck" + randNum + k + l);
@@ -566,15 +568,32 @@ public class HelloController implements Initializable {
         lblTurn.setText("Turn: " + p2Name);
         btnEndTurn.setDisable(true);
 
-        if (deck.size() < 20){
-            if (p1Points > p2Points){
-                System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
-            } else if (p1Points == p2Points) {
-                System.out.println("DRAW");
-            } else {
-                System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < deck.size(); j++) {
+                for (int k = 0; k < deck.size(); k++) {
+                    if (deck.get(j).cName.substring(i, i + 1).equals(deck.get(k).cName.substring(i, i + 1))){
+                        System.out.println(deck.get(j).cName.substring(i, i + 1));
+                        System.out.println(deck.get(k).cName.substring(i, i + 1));
+                        isMatch = true;
+                    }
+                    else {
+                        isMatch = false;
+                          if (deck.size() < 20){
+                            if (p1Points > p2Points){
+                                System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+                            } else if (p1Points == p2Points) {
+                                System.out.println("DRAW");
+                            } else {
+                                System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+                            }
+                        }
+                        break;
+                    }
+                }
             }
         }
+
+
     }
 
     @FXML
@@ -607,6 +626,7 @@ public class HelloController implements Initializable {
                 }
             }
         }
+
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 4; j++) {
                 int randNum = (int) (Math.random() * deck.size());
