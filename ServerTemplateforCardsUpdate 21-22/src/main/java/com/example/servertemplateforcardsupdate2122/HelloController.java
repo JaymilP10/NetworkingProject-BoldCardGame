@@ -195,9 +195,18 @@ public class HelloController implements Initializable {
                         }
                     }
                 }
-                cards[i][j] = deck.get(randNum);
-                deck.remove(randNum);
-                saveRemovedCards.add(cards[i][j]);
+                if (deck.size() > 0){
+                    saveRemovedCards.add(cards[i][j]);
+                    cards[i][j] = deck.get(randNum);
+//                    saveRemovedCards.add(deck.get(randNum));
+                    deck.remove(randNum);
+
+                } else {
+                    cards[i][j].cName = "";
+                    imageViews[i][j].setImage(null);
+                }
+
+
                 p2Points = p2Points + (cardsClicked.size() * cardsClicked.size());
                 lblp2Points.setText("P2 Points: " + p2Points);
                 isTurn = true;
@@ -216,9 +225,16 @@ public class HelloController implements Initializable {
                 }
                 cardsClicked.clear();
                 isTurn = true;
+                lblTurn.setText("Turn: " + p1Name);
                 btnEndTurn.setDisable(false);
             } else if (line.startsWith("name:")) {
                 p2Name = line.substring(line.indexOf("e:") + 2 );
+            } else if (line.startsWith("CHECK")){
+                if (line.substring(line.indexOf("K") + 1, line.indexOf("i")).equals(deck.get(Integer.parseInt(line.substring(line.indexOf("i") + 1))).cName)){
+                    System.out.println("YEEEEEAH");
+                } else{
+                    System.out.println("NOOOOOOOOOOOOOOOOOOO");
+                }
             }
         }
 
@@ -467,6 +483,21 @@ public class HelloController implements Initializable {
         FileReader reader = new FileReader("src/main/resources/Game Files/" + fileToLoad);
         Scanner in = new Scanner(reader);
 
+        socket.sendMessage("load");
+
+        deck.clear();
+        String[] letters = {"D", "L", "S", "B", "C", "J", "B", "O", "Y", "B", "M", "S"};
+        for (int i = 0; i < 3; i++) {
+            for (int j = 3; j < 6; j++) {
+                for (int k = 6; k < 9; k++) {
+                    for (int l = 9; l < 12; l++) {
+//                        System.out.println(letters[i] + letters[j] + letters[k] + letters[l]);
+                        deck.add(new Card(letters[i] + letters[j] + letters[k] + letters[l]));
+                    }
+                }
+            }
+        }
+
         while(in.hasNextLine()){
             String line = in.nextLine();
             if (line.startsWith("p1Name:")){
@@ -487,24 +518,29 @@ public class HelloController implements Initializable {
                 for (Card card : deck) {
                     if (card.cName.equals(line.substring(line.indexOf("e:") + 2))){
                         cards[i][j] = card;
+                        socket.sendMessage("Load cards" + "k:" + i + "l:" + j + "name:" + cards[i][j].cName);
                     }
                     imageViews[i][j].setImage(imageBack);
                 }
             } else if (line.startsWith("Removed Card")){
+                System.out.println(line);
                 for (int i = 0; i < deck.size(); i++) {
                     if (deck.get(i).cName.equals(line.substring(line.indexOf(":") + 1))){
-                        deck.remove(i);
                         socket.sendMessage("Remove Card:" + deck.get(i).cName);
+//                        System.out.println("Removed Card:" + deck.get(i).cName);
+                        deck.remove(i);
                         i--;
                     }
                 }
             }
         }
 
+        System.out.println("ds" + deck.size());
+
         for (int k = 0; k < 5; k++) {
             for (int l = 0; l < 4; l++) {
-//                System.out.println("Load cards " + "k:" + k + "l:" + l + "name:" + cards[k][l].cName);
-                socket.sendMessage("Load cards" + "k:" + k + "l:" + l + "name:" + cards[k][l].cName);
+                System.out.println("Load cards " + "k:" + k + "l:" + l + "name:" + cards[k][l].cName);
+//                socket.sendMessage("Load cards" + "k:" + k + "l:" + l + "name:" + cards[k][l].cName);
             }
         }
         lblp1Points.setText("P1 Points: " + p1Points);
@@ -517,8 +553,10 @@ public class HelloController implements Initializable {
 
         if (isTurn){
             lblTurn.setText("Turn: " + p1Name);
+            btnEndTurn.setDisable(false);
         } else {
             lblTurn.setText("Turn: " + p2Name);
+            btnEndTurn.setDisable(true);
         }
 
         socket.sendMessage("turn" + isTurn);
@@ -536,13 +574,16 @@ public class HelloController implements Initializable {
                     for (int l = 0; l < 4; l++) {
                         if (card == cards[k][l]){
                             imageViews[k][l].setImage(imageBack);
-                            deck.remove(card);
                             System.out.println("saveremoved cards len: " + saveRemovedCards.size());
                             int randNum = (int) (Math.random() * deck.size());
                             socket.sendMessage("endturn" + "randNum" + randNum + "i" + k + "j" + l);
                             System.out.println("deck" + randNum + k + l);
-                            cards[k][l] = deck.get(randNum);
-                            deck.remove(randNum);
+                            if (deck.size() > 0){
+                                cards[k][l] = deck.get(randNum);
+                                deck.remove(randNum);
+                            } else {
+                                imageViews[k][l].setImage(null);
+                            }
                         }
                     }
                 }
@@ -567,33 +608,50 @@ public class HelloController implements Initializable {
         isTurn = false;
         lblTurn.setText("Turn: " + p2Name);
         btnEndTurn.setDisable(true);
+        socket.sendMessage("turn" + isTurn);
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < deck.size(); j++) {
-                for (int k = 0; k < deck.size(); k++) {
-                    if (deck.get(j).cName.substring(i, i + 1).equals(deck.get(k).cName.substring(i, i + 1))){
-                        System.out.println(deck.get(j).cName.substring(i, i + 1));
-                        System.out.println(deck.get(k).cName.substring(i, i + 1));
-                        isMatch = true;
-                    }
-                    else {
-                        isMatch = false;
-                          if (deck.size() < 20){
-                            if (p1Points > p2Points){
-                                System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
-                            } else if (p1Points == p2Points) {
-                                System.out.println("DRAW");
-                            } else {
-                                System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
-                            }
+        boolean anyMoreMatches = true;
+
+        if (deck.size() > 1) {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < deck.size(); j++) {
+                    for (int k = 0; k < deck.size(); k++) {
+                        if (deck.get(j).cName.substring(i, i + 1).equals(deck.get(k).cName.substring(i, i + 1))){
+//                        System.out.println(deck.get(j).cName.substring(i, i + 1));
+//                        System.out.println(deck.get(k).cName.substring(i, i + 1));
+                            anyMoreMatches = true;
                         }
-                        break;
+                        else {
+                            anyMoreMatches = false;
+                        }
                     }
                 }
             }
+
+            if (!anyMoreMatches){
+                if (p1Points > p2Points){
+                    lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
+                    System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+                } else if (p1Points == p2Points) {
+                    lblTurn.setText("DRAW");
+                    System.out.println("DRAW");
+                } else {
+                    lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
+                    System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+                }
+            }
+        } else{
+            if (p1Points > p2Points){
+                lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
+                System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+            } else if (p1Points == p2Points) {
+                lblTurn.setText("DRAW");
+                System.out.println("DRAW");
+            } else {
+                lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
+                System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+            }
         }
-
-
     }
 
     @FXML
@@ -601,12 +659,15 @@ public class HelloController implements Initializable {
         socket.sendMessage("Restart");
         p1Points = 0;
         p2Points = 0;
+        lblp1Points.setText("P1 Points: " + p1Points);
+        lblp2Points.setText("P2 Points: " + p2Points);
         deck.clear();
         cardsClicked.clear();
         saveRemovedCards.clear();
 
         if (Math.random() > .5){
             lblTurn.setText("Turn: " + p1Name);
+            btnEndTurn.setDisable(false);
         } else {
             isTurn = false;
             lblTurn.setText("Turn: " + p2Name);

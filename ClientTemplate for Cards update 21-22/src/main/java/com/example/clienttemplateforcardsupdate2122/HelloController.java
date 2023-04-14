@@ -128,7 +128,7 @@ public class HelloController implements Initializable {
     class FxSocketListener implements SocketListener {
         @Override
         public void onMessage(String line) {
-            System.out.println("message received server");
+//            System.out.println("message received server");
 //            System.out.println(line);
             lblMessages.setText(line);
             if (line.equals("ready") && areReady){
@@ -137,7 +137,7 @@ public class HelloController implements Initializable {
                 serverReady=true;
             }
             else if(line.equals("dealt")){
-                System.out.println(line);
+//                System.out.println(line);
                 String[] letters = {"D", "L", "S", "B", "C", "J", "B", "O", "Y", "B", "M", "S"};
                 for (int i = 0; i < 3; i++) {
                     for (int j = 3; j < 6; j++) {
@@ -168,14 +168,14 @@ public class HelloController implements Initializable {
 //                }
 //                imgDiscard.setImage(imageFront);
             } else if (line.startsWith("deck")) {
-                System.out.println(line);
+//                System.out.println(line);
                 int randNum = Integer.parseInt(line.substring(line.indexOf("m") + 1, line.indexOf("i")));
                 int i = Integer.parseInt(line.substring(line.indexOf("i") + 1, line.indexOf("j")));
                 int j = Integer.parseInt(line.substring(line.indexOf("j")  + 1));
                 cards[i][j] = deck.get(randNum);
                 deck.remove(randNum);
             } else if (line.startsWith("clicked")) {
-                System.out.println(line);
+//                System.out.println(line);
                 int i = Integer.parseInt(line.substring(7, 8));
                 int j = Integer.parseInt(line.substring(8));
                 try {
@@ -186,14 +186,19 @@ public class HelloController implements Initializable {
                 cardsClicked.add(cards[i][j]);
                 imageViews[i][j].setImage(new Image(tempCard));
             } else if (line.startsWith("endturn")) {
-                System.out.println(line);
+//                System.out.println(line);
                 int randNum = Integer.parseInt(line.substring(line.indexOf("m") + 1, line.indexOf("i")));
                 int i = Integer.parseInt(line.substring(line.indexOf("i") + 1, line.indexOf("j")));
-                int j = Integer.parseInt(line.substring(line.indexOf("j")  + 1));
+                int j = Integer.parseInt(line.substring(line.indexOf("j") + 1));
                 imageViews[i][j].setImage(imageBack);
-                deck.remove(cards[i][j]);
-                cards[i][j] = deck.get(randNum);
-                deck.remove(randNum);
+                if (deck.size() > 0){
+                    cards[i][j] = deck.get(randNum);
+                    deck.remove(randNum);
+                } else {
+                    cards[i][j].cName = "";
+                    imageViews[i][j].setImage(null);
+                }
+
                 p1Points = p1Points + (cardsClicked.size() * cardsClicked.size());
                 lblp1Points.setText("P1 Points: " + p1Points);
                 cardsClicked.clear();
@@ -201,7 +206,7 @@ public class HelloController implements Initializable {
                 lblTurn.setText("Turn: " + p2Name);
                 btnEndTurn.setDisable(false);
             } else if (line.startsWith("nomatch")) {
-                System.out.println(line);
+//                System.out.println(line);
                 for (Card card : cardsClicked) {
                     for (int k = 0; k < 5; k++) {
                         for (int l = 0; l < 4; l++) {
@@ -215,6 +220,19 @@ public class HelloController implements Initializable {
                 isTurn = true;
                 lblTurn.setText("Turn: " + p2Name);
                 btnEndTurn.setDisable(false);
+            } else if (line.startsWith("load")){
+                deck.clear();
+                String[] letters = {"D", "L", "S", "B", "C", "J", "B", "O", "Y", "B", "M", "S"};
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 3; j < 6; j++) {
+                        for (int k = 6; k < 9; k++) {
+                            for (int l = 9; l < 12; l++) {
+//                        System.out.println(letters[i] + letters[j] + letters[k] + letters[l]);
+                                deck.add(new Card(letters[i] + letters[j] + letters[k] + letters[l]));
+                            }
+                        }
+                    }
+                }
             } else if (line.startsWith("Load cards")) {
                 System.out.println(line);
                 int k = Integer.parseInt(line.substring(line.indexOf("k:") + 2, line.indexOf("l")));
@@ -227,46 +245,48 @@ public class HelloController implements Initializable {
                     imageViews[k][l].setImage(imageBack);
                 }
             } else if (line.startsWith("Load Game")) {
-                System.out.println(line);
+//                System.out.println(line);
                 p1Points = Integer.parseInt(line.substring(line.indexOf("1") + 1, line.indexOf("p2")));
                 p2Points = Integer.parseInt(line.substring(line.indexOf("2") + 1));
                 lblp1Points.setText("P1 Points: " + p1Points);
                 lblp2Points.setText("P2 Points: " + p2Points);
             } else if (line.startsWith("name:")) {
-                System.out.println(line);
+//                System.out.println(line);
                 p1Name = line.substring(line.indexOf("e:") + 2);
             } else if (line.startsWith("turn")) {
-                System.out.println(line);
+//                System.out.println(line);
                 isTurn = !Boolean.parseBoolean(line.substring(line.indexOf("n") + 1));
                 if (isTurn){
                     lblTurn.setText("Turn: " + p2Name);
+                    btnEndTurn.setDisable(false);
                 } else {
                     lblTurn.setText("Turn: " + p1Name);
+                    btnEndTurn.setDisable(true);
                 }
 
             } else if (line.startsWith("p2Name")){
                 p2Name = line.substring(line.indexOf("e") + 1);
                 txtName.setText(p2Name);
             } else if (line.startsWith("Remove Card")){
+                String cName = line.substring(line.indexOf(":") + 1);
                 for (int i = 0; i < deck.size(); i++) {
                     if (deck.get(i).cName.equals(line.substring(line.indexOf(":") + 1))){
+                        System.out.println(deck.size());
                         deck.remove(i);
+                        System.out.println("Removed Card:" + cName);
+                        System.out.println(deck.size());
                         i--;
-                        socket.sendMessage("Remove Card:" + deck.get(i).cName);
+//                        socket.sendMessage("Remove Card:" + deck.get(i).cName);
                     }
                 }
+                System.out.println("ds" + deck.size());
             } else if (line.startsWith("Restart")) {
                 p1Points = 0;
                 p2Points = 0;
+                lblp1Points.setText("P1 Points: " + p1Points);
+                lblp2Points.setText("P2 Points: " + p2Points);
                 deck.clear();
                 cardsClicked.clear();
-
-                if (Math.random() > .5){
-                    lblTurn.setText("Turn: " + p1Name);
-                } else {
-                    isTurn = false;
-                    lblTurn.setText("Turn: " + p2Name);
-                }
 
                 String[] letters = {"D", "L", "S", "B", "C", "J", "B", "O", "Y", "B", "M", "S"};
                 for (int i = 0; i < 3; i++) {
@@ -373,8 +393,8 @@ public class HelloController implements Initializable {
             for (int j = 0; j < cardsClicked.size(); j++) {
                 for (int k = 0; k < cardsClicked.size(); k++) {
                     if (cardsClicked.get(j).cName.substring(i, i + 1).equals(cardsClicked.get(k).cName.substring(i, i + 1))){
-                        System.out.println(cardsClicked.get(j).cName.substring(i, i + 1));
-                        System.out.println(cardsClicked.get(k).cName.substring(i, i + 1));
+//                        System.out.println(cardsClicked.get(j).cName.substring(i, i + 1));
+//                        System.out.println(cardsClicked.get(k).cName.substring(i, i + 1));
                         isMatch = true;
                     }
                     else {
@@ -409,13 +429,22 @@ public class HelloController implements Initializable {
                         if (card == cards[k][l]){
                             imageViews[k][l].setImage(imageBack);
                             int randNum = (int) (Math.random() * deck.size());
+                            System.out.println("deck size: " + deck.size());
                             socket.sendMessage("endturn" + "randNum" + randNum + "i" + k + "j" + l);
                             System.out.println("deck" + randNum + k + l);
-                            cards[k][l] = deck.get(randNum);
-                            deck.remove(randNum);
+                            if (deck.size() > 0){
+                                cards[k][l] = deck.get(randNum);
+                                deck.remove(randNum);
+                            } else {
+                                cards[k][l].cName = "";
+                                imageViews[k][l].setImage(null);
+                            }
                         }
                     }
                 }
+            }
+            for (int i = 0; i < deck.size(); i++) {
+                socket.sendMessage("CHECK" + deck.get(i).cName + "i" + i);
             }
             p2Points = p2Points + (cardsClicked.size() * cardsClicked.size());
             lblp1Points.setText("P1 Points: " + p1Points);
@@ -436,6 +465,51 @@ public class HelloController implements Initializable {
         isTurn = false;
         lblTurn.setText("Turn: " + p1Name);
         btnEndTurn.setDisable(true);
+        socket.sendMessage("turn" + isTurn);
+
+        boolean anyMoreMatches = true;
+
+        if (deck.size() > 1) {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < deck.size(); j++) {
+                    for (int k = 0; k < deck.size(); k++) {
+                        if (deck.get(j).cName.substring(i, i + 1).equals(deck.get(k).cName.substring(i, i + 1))){
+//                        System.out.println(deck.get(j).cName.substring(i, i + 1));
+//                        System.out.println(deck.get(k).cName.substring(i, i + 1));
+                            anyMoreMatches = true;
+                        }
+                        else {
+                            anyMoreMatches = false;
+                        }
+                    }
+                }
+            }
+
+            if (!anyMoreMatches){
+                if (p1Points > p2Points){
+                    lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
+                    System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+                } else if (p1Points == p2Points) {
+                    lblTurn.setText("DRAW");
+                    System.out.println("DRAW");
+                } else {
+                    lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
+                    System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+                }
+            }
+        } else{
+            if (p1Points > p2Points){
+                lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
+                System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+            } else if (p1Points == p2Points) {
+                lblTurn.setText("DRAW");
+                System.out.println("DRAW");
+            } else {
+                lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
+                System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+            }
+        }
+
     }
 
     @FXML
