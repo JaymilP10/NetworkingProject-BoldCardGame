@@ -610,37 +610,32 @@ public class HelloController implements Initializable {
         btnEndTurn.setDisable(true);
         socket.sendMessage("turn" + isTurn);
 
+        if (!anyMoreMatches()){
+            gridPane.setVisible(false);
+        }
+    }
+
+    public boolean anyMoreMatches(){
         boolean anyMoreMatches = true;
 
-        if (deck.size() > 1) {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < deck.size(); j++) {
-                    for (int k = 0; k < deck.size(); k++) {
-                        if (deck.get(j).cName.substring(i, i + 1).equals(deck.get(k).cName.substring(i, i + 1))){
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < cards.length; j++) {
+                for (int k = 0; k < cards[j].length - 1; k++) {
+                    if (cards[j][k].cName != "" && cards[j][k + 1].cName != "") {
+                        if (cards[j][k].cName.substring(i, i + 1).equals(cards[j][k + 1].cName.substring(i, i + 1))) {
 //                        System.out.println(deck.get(j).cName.substring(i, i + 1));
 //                        System.out.println(deck.get(k).cName.substring(i, i + 1));
                             anyMoreMatches = true;
-                        }
-                        else {
+                            return anyMoreMatches;
+                        } else {
                             anyMoreMatches = false;
                         }
                     }
                 }
             }
+        }
 
-            if (!anyMoreMatches){
-                if (p1Points > p2Points){
-                    lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
-                    System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
-                } else if (p1Points == p2Points) {
-                    lblTurn.setText("DRAW");
-                    System.out.println("DRAW");
-                } else {
-                    lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
-                    System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
-                }
-            }
-        } else{
+        if (!anyMoreMatches){
             if (p1Points > p2Points){
                 lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
                 System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
@@ -651,7 +646,38 @@ public class HelloController implements Initializable {
                 lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
                 System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
             }
+        } else {
+            if (deck.size() > 1) {
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < deck.size(); j++) {
+                        for (int k = j + 1; k < deck.size() - 1; k++) {
+                            if (deck.get(j).cName.substring(i, i + 1).equals(deck.get(k).cName.substring(i, i + 1))) {
+//                        System.out.println(deck.get(j).cName.substring(i, i + 1));
+//                        System.out.println(deck.get(k).cName.substring(i, i + 1));
+                                anyMoreMatches = true;
+                                return anyMoreMatches;
+                            } else {
+                                anyMoreMatches = false;
+                            }
+                        }
+                    }
+                }
+
+                if (!anyMoreMatches){
+                    if (p1Points > p2Points){
+                        lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
+                        System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+                    } else if (p1Points == p2Points) {
+                        lblTurn.setText("DRAW");
+                        System.out.println("DRAW");
+                    } else {
+                        lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
+                        System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+                    }
+                }
+            }
         }
+        return anyMoreMatches;
     }
 
     @FXML
