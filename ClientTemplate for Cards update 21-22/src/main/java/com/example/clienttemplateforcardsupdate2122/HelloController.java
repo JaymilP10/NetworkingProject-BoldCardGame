@@ -157,7 +157,7 @@ public class HelloController implements Initializable {
 
             } else if(line.startsWith("sCardNum")){
                 numInServerHand = Integer.parseInt(line.substring(8));
-                System.out.println(numInServerHand);
+//                System.out.println(numInServerHand);
             } else if (line.startsWith("discard")){
 //                discardCard = new Card(line.substring(7));
 //                try {
@@ -234,10 +234,10 @@ public class HelloController implements Initializable {
                     }
                 }
             } else if (line.startsWith("Load cards")) {
-                System.out.println(line);
+//                System.out.println(line);
                 int k = Integer.parseInt(line.substring(line.indexOf("k:") + 2, line.indexOf("l")));
                 int l = Integer.parseInt(line.substring(line.indexOf("l:") + 2, line.indexOf("n")));
-                System.out.println(k + " " + l + " " + line.substring(line.indexOf("e:") + 2));
+//                System.out.println(k + " " + l + " " + line.substring(line.indexOf("e:") + 2));
                 for (Card card : deck) {
                     if (card.cName.equals(line.substring(line.indexOf("e:") + 2))){
                         cards[k][l] = card;
@@ -271,15 +271,15 @@ public class HelloController implements Initializable {
                 String cName = line.substring(line.indexOf(":") + 1);
                 for (int i = 0; i < deck.size(); i++) {
                     if (deck.get(i).cName.equals(line.substring(line.indexOf(":") + 1))){
-                        System.out.println(deck.size());
+//                        System.out.println(deck.size());
                         deck.remove(i);
-                        System.out.println("Removed Card:" + cName);
-                        System.out.println(deck.size());
+//                        System.out.println("Removed Card:" + cName);
+//                        System.out.println(deck.size());
                         i--;
 //                        socket.sendMessage("Remove Card:" + deck.get(i).cName);
                     }
                 }
-                System.out.println("ds" + deck.size());
+//                System.out.println("ds" + deck.size());
             } else if (line.startsWith("Restart")) {
                 p1Points = 0;
                 p2Points = 0;
@@ -299,11 +299,15 @@ public class HelloController implements Initializable {
                         }
                     }
                 }
-                System.out.println("Server hand");
+//                System.out.println("Server hand");
                 for (int i = 0; i < 5; i++) {
                     for (int j = 0; j < 4; j++) {
                         imageViews[i][j].setImage(imageBack);
                     }
+                }
+            } else if (line.startsWith("endgame")){
+                if (!anyMoreMatches()){
+                    gridPane.setVisible(false);
                 }
             }
         }
@@ -338,7 +342,7 @@ public class HelloController implements Initializable {
                 for (int i = 0; i < 5; i++) {
                     for (int j = 0; j < 4; j++) {
                         if (((ImageView) event.getSource()) == imageViews[i][j] && isTurn && canClick){
-                            System.out.println("oc:"+i+"or:"+j);
+//                            System.out.println("oc:"+i+"or:"+j);
                             try {
                                 tempCard = new FileInputStream(cards[i][j].getCardPath());
                             } catch (FileNotFoundException e) {
@@ -349,7 +353,7 @@ public class HelloController implements Initializable {
                             socket.sendMessage("clicked" + i + j);
                             if (!checkMatch()){
                                 canClick = false;
-                                System.out.println("CARDS DONT MATCH");
+//                                System.out.println("CARDS DONT MATCH");
                                 if (!checkMatch()){
                                     startTime = System.nanoTime();
                                     new AnimationTimer(){
@@ -429,9 +433,9 @@ public class HelloController implements Initializable {
                         if (card == cards[k][l]){
                             imageViews[k][l].setImage(imageBack);
                             int randNum = (int) (Math.random() * deck.size());
-                            System.out.println("deck size: " + deck.size());
+//                            System.out.println("deck size: " + deck.size());
                             socket.sendMessage("endturn" + "randNum" + randNum + "i" + k + "j" + l);
-                            System.out.println("deck" + randNum + k + l);
+//                            System.out.println("deck" + randNum + k + l);
                             if (deck.size() > 0){
                                 cards[k][l] = deck.get(randNum);
                                 deck.remove(randNum);
@@ -469,6 +473,7 @@ public class HelloController implements Initializable {
 
         if (!anyMoreMatches()){
             gridPane.setVisible(false);
+            socket.sendMessage("endgame");
         }
     }
 
@@ -476,10 +481,10 @@ public class HelloController implements Initializable {
         boolean anyMoreMatches = true;
 
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < cards.length; j++) {
-                for (int k = 0; k < cards[j].length - 1; k++) {
-                    if (cards[j][k].cName != "" && cards[j][k + 1].cName != "") {
-                        if (cards[j][k].cName.substring(i, i + 1).equals(cards[j][k + 1].cName.substring(i, i + 1))) {
+            for (Card[] card : cards) {
+                for (int k = 0; k < card.length - 1; k++) {
+                    if (!card[k].cName.equals("") && !card[k + 1].cName.equals("")) {
+                        if (card[k].cName.substring(i, i + 1).equals(card[k + 1].cName.substring(i, i + 1))) {
 //                        System.out.println(deck.get(j).cName.substring(i, i + 1));
 //                        System.out.println(deck.get(k).cName.substring(i, i + 1));
                             anyMoreMatches = true;
@@ -494,14 +499,14 @@ public class HelloController implements Initializable {
 
         if (!anyMoreMatches){
             if (p1Points > p2Points){
-                lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
-                System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+                lblTurn.setText("WINNER IS " + p1Name + "!!");
+                System.out.println("WINNER IS " + p1Name + "!!");
             } else if (p1Points == p2Points) {
                 lblTurn.setText("DRAW");
                 System.out.println("DRAW");
             } else {
-                lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
-                System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+                lblTurn.setText("WINNER IS " + p2Name + "!!");
+                System.out.println("WINNER iS " + p2Name + "!!");
             }
         } else {
             if (deck.size() > 1) {

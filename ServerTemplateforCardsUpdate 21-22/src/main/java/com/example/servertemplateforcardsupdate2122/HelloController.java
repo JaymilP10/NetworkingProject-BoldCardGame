@@ -235,6 +235,10 @@ public class HelloController implements Initializable {
                 } else{
                     System.out.println("NOOOOOOOOOOOOOOOOOOO");
                 }
+            } else if (line.startsWith("endgame")){
+                if (!anyMoreMatches()){
+                    gridPane.setVisible(false);
+                }
             }
         }
 
@@ -279,7 +283,7 @@ public class HelloController implements Initializable {
                     for (int i = 0; i < 5; i++) {
                         for (int j = 0; j < 4; j++) {
                             if (((ImageView) event.getSource()) == imageViews[i][j] && isTurn && canClick){
-                                System.out.println("oc:"+i+"or:"+j);
+//                                System.out.println("oc:"+i+"or:"+j);
                                 try {
                                     tempCard = new FileInputStream(cards[i][j].getCardPath());
                                 } catch (FileNotFoundException e) {
@@ -287,6 +291,7 @@ public class HelloController implements Initializable {
                                 }
                                 imageViews[i][j].setImage(new Image(tempCard));
                                 cardsClicked.add(cards[i][j]);
+                                btnEndTurn.setDisable(cardsClicked.size() <= 1);
                                 socket.sendMessage("clicked" + i + j);
                                 if (!checkMatch()){
                                     canClick = false;
@@ -382,13 +387,12 @@ public class HelloController implements Initializable {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < cardsClicked.size(); j++) {
-                for (int k = 0; k < cardsClicked.size(); k++) {
-                    if (cardsClicked.get(j).cName.substring(i, i + 1).equals(cardsClicked.get(k).cName.substring(i, i + 1))){
+                for (Card card : cardsClicked) {
+                    if (cardsClicked.get(j).cName.substring(i, i + 1).equals(card.cName.substring(i, i + 1))) {
 //                        System.out.println(cardsClicked.get(j).cName.substring(i, i + 1));
 //                        System.out.println(cardsClicked.get(k).cName.substring(i, i + 1));
                         isMatch = true;
-                    }
-                    else {
+                    } else {
                         isMatch = false;
                         break;
                     }
@@ -410,6 +414,7 @@ public class HelloController implements Initializable {
 
     @FXML
     private void save() {
+        ArrayList<String> names = new ArrayList<>();
         String outFile = "src/main/resources/Game Files/names";
         String saveAs = txtSaveAs.getText();
         try {
@@ -429,16 +434,28 @@ public class HelloController implements Initializable {
             throw new RuntimeException(e);
         }
         try {
+            FileReader reader = new FileReader("src/main/resources/Game Files/names");
+            Scanner in = new Scanner(reader);
+            while (in.hasNextLine()){
+                names.add(in.nextLine());
+            }
+            names.add(saveAs);
             PrintWriter out = new PrintWriter(outFile);
             /*This is where you would save your data.  Each time you
             run the line out.println(______) you will save a line of data
             in the text file.
              */
-
-            out.println(saveAs);
             //you don't need a loop.  Just type the line below as many times as you want
             //out.println();
+            for (String name : names) {
+                System.out.println(name);
+                out.println(name);
+            }
             out.close();
+        } catch (FileNotFoundException var1) {
+            System.out.println("no file");
+        }
+        try {
             PrintWriter currentGame = new PrintWriter("src/main/resources/Game Files/" + saveAs);
             currentGame.println();
             currentGame.println("p1Name:" + p1Name);
@@ -612,6 +629,7 @@ public class HelloController implements Initializable {
 
         if (!anyMoreMatches()){
             gridPane.setVisible(false);
+            socket.sendMessage("endgame");
         }
     }
 
@@ -619,10 +637,10 @@ public class HelloController implements Initializable {
         boolean anyMoreMatches = true;
 
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < cards.length; j++) {
-                for (int k = 0; k < cards[j].length - 1; k++) {
-                    if (cards[j][k].cName != "" && cards[j][k + 1].cName != "") {
-                        if (cards[j][k].cName.substring(i, i + 1).equals(cards[j][k + 1].cName.substring(i, i + 1))) {
+            for (Card[] card : cards) {
+                for (int k = 0; k < card.length - 1; k++) {
+                    if (!card[k].cName.equals("") && !card[k + 1].cName.equals("")) {
+                        if (card[k].cName.substring(i, i + 1).equals(card[k + 1].cName.substring(i, i + 1))) {
 //                        System.out.println(deck.get(j).cName.substring(i, i + 1));
 //                        System.out.println(deck.get(k).cName.substring(i, i + 1));
                             anyMoreMatches = true;
