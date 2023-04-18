@@ -656,14 +656,14 @@ public class HelloController implements Initializable {
 
         if (!anyMoreMatches){
             if (p1Points > p2Points){
-                lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
-                System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+                lblTurn.setText("WINNER IS " + p1Name + "!!");
+                System.out.println("WINNER IS " + p1Name + "!!");
             } else if (p1Points == p2Points) {
                 lblTurn.setText("DRAW");
                 System.out.println("DRAW");
             } else {
-                lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
-                System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+                lblTurn.setText("WINNER IS " + p2Name + "!!");
+                System.out.println("WINNER iS " + p2Name + "!!");
             }
         } else {
             if (deck.size() > 1) {
@@ -693,6 +693,17 @@ public class HelloController implements Initializable {
                         lblTurn.setText("WINNER IS " + p2Name + "!!");
                         System.out.println("WINNER iS " + p2Name + "!!");
                     }
+                }
+            } else {
+                if (p1Points > p2Points){
+                    lblTurn.setText("WINNER IS " + p1Name + "!!");
+                    System.out.println("WINNER IS " + p1Name + "!!");
+                } else if (p1Points == p2Points) {
+                    lblTurn.setText("DRAW");
+                    System.out.println("DRAW");
+                } else {
+                    lblTurn.setText("WINNER IS " + p2Name + "!!");
+                    System.out.println("WINNER iS " + p2Name + "!!");
                 }
             }
         }
