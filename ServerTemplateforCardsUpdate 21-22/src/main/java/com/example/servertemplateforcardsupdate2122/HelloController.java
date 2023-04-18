@@ -385,24 +385,25 @@ public class HelloController implements Initializable {
             return true;
         }
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < cardsClicked.size(); j++) {
-                for (Card card : cardsClicked) {
-                    if (cardsClicked.get(j).cName.substring(i, i + 1).equals(card.cName.substring(i, i + 1))) {
-//                        System.out.println(cardsClicked.get(j).cName.substring(i, i + 1));
+        for (int i = 0; i < 4; i++) {
+            for (int j = 1; j < cardsClicked.size(); j++) {
+                if (cardsClicked.get(0).cName.charAt(i) == (cardsClicked.get(j).cName.charAt(i))) {
+//                    System.out.println(cardsClicked.get(j).cName);
+//                    System.out.println(cardsClicked.get(j).cName.charAt(i));
 //                        System.out.println(cardsClicked.get(k).cName.substring(i, i + 1));
-                        isMatch = true;
-                    } else {
-                        isMatch = false;
-                        break;
-                    }
+                    isMatch = true;
+                } else {
+                    isMatch = false;
+                    break;
                 }
-                if (isMatch){
-                    saveRemovedCards.addAll(cardsClicked);
-                    return true;
-                }
+
+            }
+            if (isMatch){
+                saveRemovedCards.addAll(cardsClicked);
+                return true;
             }
         }
+
         return false;
     }
 
@@ -636,11 +637,11 @@ public class HelloController implements Initializable {
     public boolean anyMoreMatches(){
         boolean anyMoreMatches = true;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             for (Card[] card : cards) {
                 for (int k = 0; k < card.length - 1; k++) {
                     if (!card[k].cName.equals("") && !card[k + 1].cName.equals("")) {
-                        if (card[k].cName.substring(i, i + 1).equals(card[k + 1].cName.substring(i, i + 1))) {
+                        if (card[k].cName.charAt(i) == (card[k + 1].cName.charAt(i))) {
 //                        System.out.println(deck.get(j).cName.substring(i, i + 1));
 //                        System.out.println(deck.get(k).cName.substring(i, i + 1));
                             anyMoreMatches = true;
@@ -666,10 +667,10 @@ public class HelloController implements Initializable {
             }
         } else {
             if (deck.size() > 1) {
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 4; i++) {
                     for (int j = 0; j < deck.size(); j++) {
                         for (int k = j + 1; k < deck.size() - 1; k++) {
-                            if (deck.get(j).cName.substring(i, i + 1).equals(deck.get(k).cName.substring(i, i + 1))) {
+                            if (deck.get(j).cName.charAt(i) == (deck.get(k).cName.charAt(i))) {
 //                        System.out.println(deck.get(j).cName.substring(i, i + 1));
 //                        System.out.println(deck.get(k).cName.substring(i, i + 1));
                                 anyMoreMatches = true;
@@ -683,14 +684,14 @@ public class HelloController implements Initializable {
 
                 if (!anyMoreMatches){
                     if (p1Points > p2Points){
-                        lblTurn.setText("WINNER IS " + p1Name + "!!!!!!!!!");
-                        System.out.println("WINNER IS " + p1Name + "!!!!!!!!!");
+                        lblTurn.setText("WINNER IS " + p1Name + "!!");
+                        System.out.println("WINNER IS " + p1Name + "!!");
                     } else if (p1Points == p2Points) {
                         lblTurn.setText("DRAW");
                         System.out.println("DRAW");
                     } else {
-                        lblTurn.setText("WINNER IS " + p2Name + "!!!!!!!!!");
-                        System.out.println("WINNER iS " + p2Name + "!!!!!!!!!");
+                        lblTurn.setText("WINNER IS " + p2Name + "!!");
+                        System.out.println("WINNER iS " + p2Name + "!!");
                     }
                 }
             }

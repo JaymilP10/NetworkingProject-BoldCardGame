@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="ClientTemplateforCardsupdate21-22" target="17" />
+      <module name="ClientTemplateforCardsupdate21-22" target="16" />
     </bytecodeTargetLevel>
   </component>
 </project>

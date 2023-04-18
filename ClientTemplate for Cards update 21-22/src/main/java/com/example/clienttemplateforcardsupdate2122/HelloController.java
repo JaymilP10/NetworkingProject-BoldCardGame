@@ -387,33 +387,34 @@ public class HelloController implements Initializable {
             ready.setDisable(true);
         }
     }
+
     public boolean checkMatch(){
 
         if (cardsClicked.size() == 1){
             return true;
         }
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < cardsClicked.size(); j++) {
-                for (int k = 0; k < cardsClicked.size(); k++) {
-                    if (cardsClicked.get(j).cName.substring(i, i + 1).equals(cardsClicked.get(k).cName.substring(i, i + 1))){
-//                        System.out.println(cardsClicked.get(j).cName.substring(i, i + 1));
+        for (int i = 0; i < 4; i++) {
+            for (int j = 1; j < cardsClicked.size(); j++) {
+                if (cardsClicked.get(0).cName.charAt(i) == (cardsClicked.get(j).cName.charAt(i))) {
+//                    System.out.println(cardsClicked.get(j).cName);
+//                    System.out.println(cardsClicked.get(j).cName.charAt(i));
 //                        System.out.println(cardsClicked.get(k).cName.substring(i, i + 1));
-                        isMatch = true;
-                    }
-                    else {
-                        isMatch = false;
-                        break;
-                    }
+                    isMatch = true;
+                } else {
+                    isMatch = false;
+                    break;
                 }
-                if (isMatch){
-                    for (Card card : cardsClicked) {
-                        socket.sendMessage("Save card: " + card.cName);
-                    }
-                    return true;
+
+            }
+            if (isMatch){
+                for (Card card : cardsClicked) {
+                    socket.sendMessage("Save card: " + card.cName);
                 }
+                return true;
             }
         }
+
         return false;
     }
 
