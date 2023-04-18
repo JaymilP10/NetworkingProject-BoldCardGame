@@ -287,6 +287,7 @@ public class HelloController implements Initializable {
                 lblp2Points.setText("P2 Points: " + p2Points);
                 deck.clear();
                 cardsClicked.clear();
+                gridPane.setVisible(true);
 
                 String[] letters = {"D", "L", "S", "B", "C", "J", "B", "O", "Y", "B", "M", "S"};
                 for (int i = 0; i < 3; i++) {
@@ -474,6 +475,16 @@ public class HelloController implements Initializable {
         if (!anyMoreMatches()){
             gridPane.setVisible(false);
             socket.sendMessage("endgame");
+            if (p1Points > p2Points){
+                lblTurn.setText("WINNER IS " + p1Name + "!!");
+                System.out.println("WINNER IS " + p1Name + "!!");
+            } else if (p1Points == p2Points) {
+                lblTurn.setText("DRAW");
+                System.out.println("DRAW");
+            } else {
+                lblTurn.setText("WINNER IS " + p2Name + "!!");
+                System.out.println("WINNER iS " + p2Name + "!!");
+            }
         }
     }
 
@@ -497,58 +508,21 @@ public class HelloController implements Initializable {
             }
         }
 
-        if (!anyMoreMatches){
-            if (p1Points > p2Points){
-                lblTurn.setText("WINNER IS " + p1Name + "!!");
-                System.out.println("WINNER IS " + p1Name + "!!");
-            } else if (p1Points == p2Points) {
-                lblTurn.setText("DRAW");
-                System.out.println("DRAW");
-            } else {
-                lblTurn.setText("WINNER IS " + p2Name + "!!");
-                System.out.println("WINNER iS " + p2Name + "!!");
-            }
-        } else {
-            if (deck.size() > 1) {
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < deck.size(); j++) {
-                        for (int k = j + 1; k < deck.size() - 1; k++) {
-                            if (deck.get(j).cName.charAt(i) == (deck.get(k).cName.charAt(i))) {
+        if (deck.size() > 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < deck.size() - 1; j++) {
+                    if (deck.get(j).cName.charAt(i) == (deck.get(j + 1).cName.charAt(i))) {
 //                        System.out.println(deck.get(j).cName.substring(i, i + 1));
 //                        System.out.println(deck.get(k).cName.substring(i, i + 1));
-                                anyMoreMatches = true;
-                                return anyMoreMatches;
-                            } else {
-                                anyMoreMatches = false;
-                            }
-                        }
-                    }
-                }
-
-                if (!anyMoreMatches){
-                    if (p1Points > p2Points){
-                        lblTurn.setText("WINNER IS " + p1Name + "!!");
-                        System.out.println("WINNER IS " + p1Name + "!!");
-                    } else if (p1Points == p2Points) {
-                        lblTurn.setText("DRAW");
-                        System.out.println("DRAW");
+                        anyMoreMatches = true;
+                        return anyMoreMatches;
                     } else {
-                        lblTurn.setText("WINNER IS " + p2Name + "!!");
-                        System.out.println("WINNER iS " + p2Name + "!!");
+                        anyMoreMatches = false;
                     }
-                }
-            } else {
-                if (p1Points > p2Points){
-                    lblTurn.setText("WINNER IS " + p1Name + "!!");
-                    System.out.println("WINNER IS " + p1Name + "!!");
-                } else if (p1Points == p2Points) {
-                    lblTurn.setText("DRAW");
-                    System.out.println("DRAW");
-                } else {
-                    lblTurn.setText("WINNER IS " + p2Name + "!!");
-                    System.out.println("WINNER iS " + p2Name + "!!");
                 }
             }
+        } else {
+            return false;
         }
         return anyMoreMatches;
     }
