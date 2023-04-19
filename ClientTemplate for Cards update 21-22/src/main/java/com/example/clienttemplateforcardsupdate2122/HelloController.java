@@ -356,6 +356,7 @@ public class HelloController implements Initializable {
                                 canClick = false;
 //                                System.out.println("CARDS DONT MATCH");
                                 if (!checkMatch()){
+                                    btnEndTurn.setDisable(true);
                                     startTime = System.nanoTime();
                                     new AnimationTimer(){
                                         @Override
@@ -490,18 +491,18 @@ public class HelloController implements Initializable {
 
     public boolean anyMoreMatches(){
         boolean anyMoreMatches = true;
-        
+
         for (int i = 0; i < 4; i++) {
-            for (Card[] card : cards) {
-                for (int k = 0; k < card.length - 1; k++) {
-                    if (!card[k].cName.equals("") && !card[k + 1].cName.equals("")) {
-                        if (card[k].cName.charAt(i) == (card[k + 1].cName.charAt(i))) {
-//                        System.out.println(deck.get(j).cName.substring(i, i + 1));
-//                        System.out.println(deck.get(k).cName.substring(i, i + 1));
-                            anyMoreMatches = true;
-                            return anyMoreMatches;
-                        } else {
-                            anyMoreMatches = false;
+            for (int j = 0; j < cards.length; j++) {
+                for (int k = 0; k < cards[j].length; k++) {
+                    for (int l = 0; l < cards.length; l++) {
+                        for (int m = 0; m < cards[l].length; m++) {
+                            if (!cards[j][k].cName.equals("") && !cards[l][m].cName.equals("") && cards[j][k] != cards[l][m]){
+                                if (cards[j][k].cName.charAt(i) == cards[l][m].cName.charAt(i)){
+                                    anyMoreMatches = true;
+                                    return anyMoreMatches;
+                                }
+                            }
                         }
                     }
                 }

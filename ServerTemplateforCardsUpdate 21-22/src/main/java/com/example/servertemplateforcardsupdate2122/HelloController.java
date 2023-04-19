@@ -164,7 +164,7 @@ public class HelloController implements Initializable {
 
         @Override
         public void onMessage(String line) {
-            System.out.println("message received client");
+//            System.out.println("message received client");
             lblMessages.setText(line);
             if (line.equals("ready") && areReady){
 
@@ -252,7 +252,7 @@ public class HelloController implements Initializable {
     private void handleSendMessageButton(ActionEvent event) {
         if (!sendTextField.getText().equals("")) {
             socket.sendMessage(sendTextField.getText());
-            System.out.println("Message sent client");
+//            System.out.println("Message sent client");
         }
     }
     @FXML
@@ -295,6 +295,7 @@ public class HelloController implements Initializable {
                                 socket.sendMessage("clicked" + i + j);
                                 if (!checkMatch()){
                                     canClick = false;
+                                    btnEndTurn.setDisable(true);
                                     startTime = System.nanoTime();
                                     new AnimationTimer(){
                                         @Override
@@ -363,7 +364,7 @@ public class HelloController implements Initializable {
                 deck.remove(randNum);
             }
         }
-        System.out.println("Server hand");
+//        System.out.println("Server hand");
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 4; j++) {
                 imageViews[i][j].setImage(imageBack);
@@ -527,7 +528,7 @@ public class HelloController implements Initializable {
             } else if (line.startsWith("p2points:")){
                 p2Points = Integer.parseInt(line.substring(line.indexOf(":") + 1));
             } else if (line.startsWith("Turn")) {
-                System.out.println(line.substring(line.indexOf("n") + 1));
+//                System.out.println(line.substring(line.indexOf("n") + 1));
                 isTurn = Boolean.parseBoolean(line.substring(line.indexOf("n") + 1));
             } else if (line.startsWith("Card")){
                 int i = Integer.parseInt(line.substring(line.indexOf("i:") + 2, line.indexOf("j")));
@@ -546,7 +547,7 @@ public class HelloController implements Initializable {
                 }
 
             } else if (line.startsWith("Removed Card")){
-                System.out.println(line);
+//                System.out.println(line);
                 for (int i = 0; i < deck.size(); i++) {
                     if (deck.get(i).cName.equals(line.substring(line.indexOf(":") + 1))){
                         socket.sendMessage("Remove Card:" + deck.get(i).cName);
@@ -558,11 +559,11 @@ public class HelloController implements Initializable {
             }
         }
 
-        System.out.println("ds" + deck.size());
+//        System.out.println("ds" + deck.size());
 
         for (int k = 0; k < 5; k++) {
             for (int l = 0; l < 4; l++) {
-                System.out.println("Load cards " + "k:" + k + "l:" + l + "name:" + cards[k][l].cName);
+//                System.out.println("Load cards " + "k:" + k + "l:" + l + "name:" + cards[k][l].cName);
 //                socket.sendMessage("Load cards" + "k:" + k + "l:" + l + "name:" + cards[k][l].cName);
             }
         }
@@ -597,10 +598,10 @@ public class HelloController implements Initializable {
                     for (int l = 0; l < 4; l++) {
                         if (card == cards[k][l]){
                             imageViews[k][l].setImage(imageBack);
-                            System.out.println("saveremoved cards len: " + saveRemovedCards.size());
+//                            System.out.println("saveremoved cards len: " + saveRemovedCards.size());
                             int randNum = (int) (Math.random() * deck.size());
                             socket.sendMessage("endturn" + "randNum" + randNum + "i" + k + "j" + l);
-                            System.out.println("deck" + randNum + k + l);
+//                            System.out.println("deck" + randNum + k + l);
                             if (deck.size() > 0){
                                 cards[k][l] = deck.get(randNum);
                                 deck.remove(randNum);
@@ -654,17 +655,28 @@ public class HelloController implements Initializable {
         boolean anyMoreMatches = false;
 
         for (int i = 0; i < 4; i++) {
-            for (Card[] card : cards) {
-                for (int k = 0; k < card.length - 1; k++) {
-                    if (!card[k].cName.equals("") && !card[k + 1].cName.equals("")) {
-                        if (card[k].cName.charAt(i) == (card[k + 1].cName.charAt(i))) {
-//                        System.out.println(deck.get(j).cName.substring(i, i + 1));
-//                        System.out.println(deck.get(k).cName.substring(i, i + 1));
-                            anyMoreMatches = true;
-                            return anyMoreMatches;
+            for (int j = 0; j < cards.length; j++) {
+                for (int k = 0; k < cards[j].length; k++) {
+                    System.out.println(cards[j][k].cName);
+                    for (int l = 0; l < cards.length; l++) {
+                        for (int m = 0; m < cards[l].length; m++) {
+                            System.out.println(cards[l][m].cName);
+                            if (!cards[j][k].cName.equals("") && !cards[l][m].cName.equals("") && cards[j][k] != cards[l][m]){
+                                if (cards[j][k].cName.charAt(i) == cards[l][m].cName.charAt(i)){
+
+                                    anyMoreMatches = true;
+                                    return anyMoreMatches;
+                                }
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        for (Card[] cardA : cards) {
+            for (Card card: cardA) {
+                System.out.println("CARD NAME" + card.cName);
             }
         }
 
