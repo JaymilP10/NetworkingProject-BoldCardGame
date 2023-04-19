@@ -238,6 +238,16 @@ public class HelloController implements Initializable {
             } else if (line.startsWith("endgame")){
                 if (!anyMoreMatches()){
                     gridPane.setVisible(false);
+                    if (p1Points > p2Points){
+                        lblTurn.setText("WINNER IS " + p1Name + "!!");
+                        System.out.println("WINNER IS " + p1Name + "!!");
+                    } else if (p1Points == p2Points) {
+                        lblTurn.setText("DRAW");
+                        System.out.println("DRAW");
+                    } else {
+                        lblTurn.setText("WINNER IS " + p2Name + "!!");
+                        System.out.println("WINNER iS " + p2Name + "!!");
+                    }
                 }
             }
         }
